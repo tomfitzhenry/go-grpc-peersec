@@ -1,0 +1,158 @@
+; Base SELinux CIL policy for the WireGuard + XFRM ESP-NULL Labeled IPsec demo.
+; Compiled together with generated.cil by secilc (no refpolicy, no m4, no MLS).
+
+; Undeclared classes (tcp_socket, udp_socket, capability, netlink_xfrm_socket,
+; etc.) are allowed so the policy stays focused on XFRM Labeled IPsec and
+; per-service Type Enforcement.
+(handleunknown allow)
+(mls false)
+
+(policycap network_peer_controls)
+(policycap open_perms)
+(policycap nnp_nosuid_transition)
+
+(user system_u)
+; Kernel requires object_r to be role 1.
+(role object_r)
+(role system_r)
+(userrole system_u object_r)
+(userrole system_u system_r)
+
+; Unconfined system domain (PID 1, WireGuard, ip xfrm setup, test harness).
+(type unconfined_t)
+(roletype system_r unconfined_t)
+
+(typeattribute domain)
+(typeattributeset domain (unconfined_t))
+
+; Confined service domains (populated in generated.cil).
+(typeattribute confined_domain)
+
+; XFRM Security Policy Database (SPD) context type.
+(type ipsec_spd_t)
+(roletype object_r ipsec_spd_t)
+
+; Generic file and network object types.
+(type os_file_t)
+(type unlabeled_t)
+(type netif_t)
+(type node_t)
+
+(typeattribute file_type)
+(typeattributeset file_type (os_file_t unlabeled_t))
+(roletype object_r file_type)
+(roletype object_r netif_t)
+(roletype object_r node_t)
+
+(context unconfined_ctx (system_u system_r unconfined_t ((s0) (s0))))
+(context os_file_ctx (system_u object_r os_file_t ((s0) (s0))))
+(context unlabeled_ctx (system_u object_r unlabeled_t ((s0) (s0))))
+(context netif_ctx (system_u object_r netif_t ((s0) (s0))))
+(context node_ctx (system_u object_r node_t ((s0) (s0))))
+
+; CIL requires a sensitivity/userlevel declaration even with (mls false);
+; secilc -M false omits MLS from the compiled binary policy.
+(sensitivity s0)
+(sensitivityorder (s0))
+(userlevel system_u (s0))
+(userrange system_u ((s0) (s0)))
+
+; Initial SIDs in kernel order (security/selinux/include/initial_sid_to_string.h).
+(sid kernel)
+(sid security)
+(sid unlabeled)
+(sid fs)
+(sid file)
+(sid file_labels)
+(sid init)
+(sid any_socket)
+(sid port)
+(sid netif)
+(sid netmsg)
+(sid node)
+(sid igmp_packet)
+(sid icmp_socket)
+(sid tcp_socket)
+(sid sysctl_modprobe)
+(sid sysctl)
+(sid sysctl_fs)
+(sid sysctl_kernel)
+(sid sysctl_net)
+(sid sysctl_net_unix)
+(sid sysctl_vm)
+(sid sysctl_dev)
+(sid kmod)
+(sid policy)
+(sid scmp_packet)
+(sid devnull)
+(sidorder (kernel security unlabeled fs file file_labels init any_socket port
+           netif netmsg node igmp_packet icmp_socket tcp_socket sysctl_modprobe
+           sysctl sysctl_fs sysctl_kernel sysctl_net sysctl_net_unix sysctl_vm
+           sysctl_dev kmod policy scmp_packet devnull))
+
+(sidcontext kernel unconfined_ctx)
+(sidcontext init unconfined_ctx)
+(sidcontext security unconfined_ctx)
+(sidcontext unlabeled unlabeled_ctx)
+(sidcontext fs os_file_ctx)
+(sidcontext file os_file_ctx)
+(sidcontext file_labels os_file_ctx)
+(sidcontext any_socket unconfined_ctx)
+(sidcontext port os_file_ctx)
+(sidcontext netif netif_ctx)
+(sidcontext netmsg os_file_ctx)
+(sidcontext node node_ctx)
+(sidcontext igmp_packet os_file_ctx)
+(sidcontext icmp_socket os_file_ctx)
+(sidcontext tcp_socket os_file_ctx)
+(sidcontext sysctl_modprobe os_file_ctx)
+(sidcontext sysctl os_file_ctx)
+(sidcontext sysctl_fs os_file_ctx)
+(sidcontext sysctl_kernel os_file_ctx)
+(sidcontext sysctl_net os_file_ctx)
+(sidcontext sysctl_net_unix os_file_ctx)
+(sidcontext sysctl_vm os_file_ctx)
+(sidcontext sysctl_dev os_file_ctx)
+(sidcontext kmod os_file_ctx)
+(sidcontext policy os_file_ctx)
+(sidcontext scmp_packet os_file_ctx)
+(sidcontext devnull os_file_ctx)
+
+(fsuse xattr ext4 os_file_ctx)
+(fsuse xattr xfs os_file_ctx)
+(fsuse xattr btrfs os_file_ctx)
+(fsuse xattr overlay os_file_ctx)
+
+(fsuse trans tmpfs os_file_ctx)
+(fsuse trans devtmpfs os_file_ctx)
+(fsuse trans devpts os_file_ctx)
+(fsuse trans mqueue os_file_ctx)
+(fsuse trans hugetlbfs os_file_ctx)
+
+(fsuse task pipefs os_file_ctx)
+(fsuse task sockfs os_file_ctx)
+
+(genfscon proc "/" os_file_ctx)
+(genfscon sysfs "/" os_file_ctx)
+(genfscon selinuxfs "/" os_file_ctx)
+(genfscon securityfs "/" os_file_ctx)
+(genfscon cgroup "/" os_file_ctx)
+(genfscon cgroup2 "/" os_file_ctx)
+(genfscon bpf "/" os_file_ctx)
+(genfscon debugfs "/" os_file_ctx)
+(genfscon tracefs "/" os_file_ctx)
+(genfscon configfs "/" os_file_ctx)
+(genfscon pstore "/" os_file_ctx)
+(genfscon efivarfs "/" os_file_ctx)
+(genfscon fusectl "/" os_file_ctx)
+(genfscon binfmt_misc "/" os_file_ctx)
+(genfscon autofs "/" os_file_ctx)
+(genfscon ramfs "/" os_file_ctx)
+(genfscon rootfs "/" os_file_ctx)
+(genfscon nsfs "/" os_file_ctx)
+(genfscon 9p "/" os_file_ctx)
+(genfscon virtiofs "/" os_file_ctx)
+(genfscon vfat "/" os_file_ctx)
+(genfscon iso9660 "/" os_file_ctx)
+(genfscon squashfs "/" os_file_ctx)
+(genfscon erofs "/" os_file_ctx)
